@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import shutil
@@ -6,20 +7,15 @@ import pytest
 
 from flexmock import flexmock
 
-try:
-    import xmlrpclib
-except ImportError:
-    import xmlrpc.client as xmlrpclib
-
+from pyp2rpm.convertor import PyPIClient
 from pyp2rpm.package_getters import LocalFileGetter, PypiDownloader, get_url
 from pyp2rpm.exceptions import MissingUrlException, NoSuchPackageException
-from pyp2rpm import settings
 
 tests_dir = os.path.split(os.path.abspath(__file__))[0]
 
 
 class TestPackageGetters(object):
-    client = xmlrpclib.ServerProxy(settings.PYPI_URL)
+    client = PyPIClient()
 
     @pytest.mark.parametrize(('name', 'version', 'wheel', 'hf', 'expected_url', 'expected_md5'), [
         ('setuptools', '18.3.1', False, False,
@@ -54,6 +50,28 @@ class TestPackageGetters(object):
         with pytest.raises(exception) as exc_info:
             get_url(self.client, name, version, wheel, hf)
         assert error_msg == str(exc_info.value)
+
+
+class TestPypiDownloader(object):
+    class StaticPyPIClient(PyPIClient):
+        def get_json(self, name, version):
+            with open('{0}/test_data/django.json'.format(tests_dir)) as json_info:
+                return json.loads(json_info.read())
+    client = StaticPyPIClient()
+
+    @pytest.mark.parametrize(('name', 'expected_ver'), [
+        ('django', '3.0.11'),
+    ])
+    def test_init_good_data(self, name, expected_ver):
+        d = PypiDownloader(self.client, name)
+        assert d.version == expected_ver
+
+    @pytest.mark.parametrize(('name', 'expected_ver'), [
+        ('django', '3.1rc1'),
+    ])
+    def test_init_good_data_pre(self, name, expected_ver):
+        d = PypiDownloader(self.client, name, prerelease=True)
+        assert d.version == expected_ver
 
 
 class TestPypiFileGetter(object):

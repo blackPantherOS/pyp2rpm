@@ -9,10 +9,6 @@ try:
     import urllib.request as request
 except ImportError:
     import urllib as request
-try:
-    import xmlrpclib
-except ImportError:
-    import xmlrpc.client as xmlrpclib
 from pkg_resources import parse_version
 
 
@@ -35,7 +31,7 @@ def get_url(client, name, version, wheel=False, hashed_format=False):
             client, name, version))
         raise exceptions.MissingUrlException(
             "Some kind of error while communicating with client: {0}.".format(
-                client), exc_info=True)
+                client))
 
     url = ''
     md5_digest = None
@@ -108,7 +104,7 @@ class PackageGetter(object):
             else:
                 try:
                     subprocess.Popen(
-                        'rpmdev-setuptree', stdout=subprocess.PIPE)
+                        'rpmdev-setuptree', stdout=subprocess.PIPE).wait()
                     logger.info("Using rpmdevtools package to make rpmbuild "
                                 "folders tree.")
                 except OSError:
@@ -131,29 +127,29 @@ class PypiDownloader(PackageGetter):
                  save_dir=None):
         self.client = client
         self.name = name
-        try:
-            self.versions = self.client.package_releases(self.name, True)
-        except xmlrpclib.ProtocolError as e:
-            sys.stderr.write("Failed to connect to server: {0} \n".format(e))
-            raise SystemExit(3)
+        if version:
+            # if version is specified, will check if such version exists
+            if not self.client.release_urls(name, version):
+                raise exceptions.NoSuchPackageException(
+                    'Package with name "{0}" and version "{1}" could not be '
+                    'found on PyPI.'.format(name, version))
 
-        # Use only stable versions, unless --pre was specified
-        if not prerelease:
-            self.versions = [candidate for candidate in self.versions
-                             if not parse_version(candidate).is_prerelease]
+            self.version = version
+        else:
+            self.versions = sorted(self.client.package_releases(self.name, True),
+                                   reverse=True, key=parse_version)
 
-        # If versions is empty list then there is no such package on PyPI
-        if not self.versions:
-            raise exceptions.NoSuchPackageException(
-                'Package "{0}" could not be found on PyPI.'.format(name))
+            # Use only stable versions, unless --pre was specified
+            if not prerelease:
+                self.versions = [candidate for candidate in self.versions
+                                 if not parse_version(candidate).is_prerelease]
 
-        self.version = version or self.versions[0]
+            # If versions is empty list then there is no such package on PyPI
+            if not self.versions:
+                raise exceptions.NoSuchPackageException(
+                    'Package "{0}" could not be found on PyPI.'.format(name))
 
-        # if version is specified, will check if such version exists
-        if version and self.client.release_urls(name, version) == []:
-            raise exceptions.NoSuchPackageException(
-                'Package with name "{0}" and version "{1}" could not be '
-                'found on PyPI.'.format(name, version))
+            self.version = self.versions[0]
         self.save_dir_init(save_dir)
 
     def get(self, wheel=False):
@@ -191,7 +187,7 @@ class LocalFileGetter(PackageGetter):
     def __init__(self, local_file, save_dir=None):
         self.local_file = local_file
         self.name_version_pattern = re.compile(
-            r"(^.*?)-(\d+\.?\d*\.?\d*\.?\d*).*$")
+            r"(^.*?)-(\d+\.?\d*\.?\d*\.?\d*\.?(?:a|b|rc|post|dev)?\d*).*$")
         self.save_dir_init(save_dir)
 
     def get(self):
@@ -213,7 +209,7 @@ class LocalFileGetter(PackageGetter):
         if not os.path.exists(save_file) or not os.path.samefile(
                 self.local_file, save_file):
             shutil.copy2(self.local_file, save_file)
-        logger.info('Local file: {0} copyed to {1}.'.format(
+        logger.info('Local file: {0} copied to {1}.'.format(
             self.local_file, save_file))
 
         return save_file

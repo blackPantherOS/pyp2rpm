@@ -1,5 +1,7 @@
+import os
 import pytest
 import shutil
+import sys
 import tempfile
 from flexmock import flexmock
 try:
@@ -15,6 +17,7 @@ from pyp2rpm.settings import DEFAULT_DISTRO, DEFAULT_PYTHON_VERSION
 pytestmark = pytest.mark.skipif(VirtualEnv is None,
                                 reason="virtualenv-api not installed")
 
+tests_dir = os.path.split(os.path.abspath(__file__))[0]
 
 class TestUtils(object):
 
@@ -65,11 +68,34 @@ class TestDirsContent(object):
         assert result.lib_sitepackages == expected
 
 
+class TestVirtualEnvGetData(object):
+
+    def setup_method(self, method):
+        self.temp_dir = tempfile.mkdtemp()
+
+    def teardown_method(self, method):
+        shutil.rmtree(self.temp_dir)
+
+    @pytest.mark.parametrize(('file', 'expected'), [
+        ('{}/test_data/utest-0.1.0.tar.gz'.format(tests_dir),
+         {'py_modules': [], 'scripts': [], 'packages': ['utest'], 'has_pth': False}),
+    ])
+    @pytest.mark.skipif(sys.version_info[0] is 2 and
+                        DEFAULT_PYTHON_VERSION is '3', reason="Can't extract virtualenv data")
+    @pytest.mark.webtest
+    def test_get_data(self, file, expected):
+        self.venv = VirtualEnv(name=file,
+                               temp_dir=self.temp_dir,
+                               name_convertor=NameConvertor(DEFAULT_DISTRO),
+                               base_python_version=DEFAULT_PYTHON_VERSION)
+        assert(self.venv.get_venv_data == expected)
+
+
 class TestVirtualEnv(object):
 
     def setup_method(self, method):
         self.temp_dir = tempfile.mkdtemp()
-        self.venv = VirtualEnv(name=None, version=None,
+        self.venv = VirtualEnv(name=None,
                                temp_dir=self.temp_dir,
                                name_convertor=NameConvertor(DEFAULT_DISTRO),
                                base_python_version=DEFAULT_PYTHON_VERSION)

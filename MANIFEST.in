@@ -1,3 +1,5 @@
+exclude .git*
+exclude .git*/**
 include CHANGELOG
 include LICENSE
 include README.md
@@ -8,5 +10,13 @@ include tests/test_data/*.gz
 include tests/test_data/*.whl
 include tests/test_data/*.zip
 include tests/test_data/*.egg
+include tests/test_data/*.json
+exclude tests/test_data/isholiday*.gz
+include tests/test_data/isholiday-0.1/*.py
+include tests/test_data/isholiday-0.1/setup.cfg
+include tests/test_data/isholiday-0.1/PKG-INFO
+exclude tests/test_data/utest*.gz
+include tests/test_data/utest/*.py
+include tests/test_data/utest/utest/*.py
 include tests/test_data/LICENSE
 include pyp2rpm.1

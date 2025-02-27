@@ -1,3 +1,28 @@
+3.3.10
+* Fix tests on Python 3.12
+
+3.3.9
+* Fix tests when using setuptools >= 67 (issue #290)
+* Use sphinx-build-%{python3_version} on EPEL7 (issue #272)
+
+3.3.8
+* Sync dependency conversion with pyreq2rpm
+
+3.3.7
+* Ensure that all tests pass under Python 3.10
+* Include rc/post/dev in version (issue #259)
+* Handle all-zero versions without crashing
+* Don't process PyPI version list if user specifies a version (issue #243)
+* Ensure that sdist is complete, and utest and JSON test data are included
+* Wait for rpmdev-setuptree to exit (issue #266)
+
+3.3.6
+* Improve logging of rpmbuild output (issue #252)
+* Sort releases so that the API ordering no longer affects local behavior (issue #251)
+
+3.3.5
+* Replace PyPI XML-RPC client with JSON client.
+
 3.3.4
 * Exclude prereleases unless specifically selected (issue #141)
 * Improve handling of PEP 440 requirements (issue #182)

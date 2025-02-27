@@ -1,9 +1,10 @@
 # Created by pyp2rpm-3.2.3
 %global pypi_name Sphinx
+%global pypi_version 1.5
 %global srcname sphinx
 
 Name:           python-%{srcname}
-Version:        1.5
+Version:        %{pypi_version}
 Release:        1%{?dist}
 Summary:        Python documentation generator
 
@@ -13,7 +14,7 @@ Source0:        %{pypi_source}
 BuildArch:      noarch
 
 BuildRequires:  python2-devel
-BuildRequires:  (python2dist(alabaster) >= 0.7 with python2dist(alabaster) < 0.8)
+BuildRequires:  (python2dist(alabaster) >= 0.7 with python2dist(alabaster) < 0.8~~)
 BuildRequires:  (python2dist(babel) >= 1.3 with (python2dist(babel) < 2 or python2dist(babel) > 2))
 BuildRequires:  python2dist(colorama) >= 0.3.5
 BuildRequires:  python2dist(docutils) >= 0.11
@@ -32,7 +33,7 @@ BuildRequires:  python2dist(sqlalchemy) >= 0.9
 BuildRequires:  python2dist(whoosh) >= 2
 
 BuildRequires:  python3-devel
-BuildRequires:  (python3dist(alabaster) >= 0.7 with python3dist(alabaster) < 0.8)
+BuildRequires:  (python3dist(alabaster) >= 0.7 with python3dist(alabaster) < 0.8~~)
 BuildRequires:  (python3dist(babel) >= 1.3 with (python3dist(babel) < 2 or python3dist(babel) > 2))
 BuildRequires:  python3dist(colorama) >= 0.3.5
 BuildRequires:  python3dist(docutils) >= 0.11
@@ -63,7 +64,7 @@ Sphinx uses...
 Summary:        %{summary}
 %{?python_provide:%python_provide python2-%{srcname}}
 
-Requires:       (python2dist(alabaster) >= 0.7 with python2dist(alabaster) < 0.8)
+Requires:       (python2dist(alabaster) >= 0.7 with python2dist(alabaster) < 0.8~~)
 Requires:       (python2dist(babel) >= 1.3 with (python2dist(babel) < 2 or python2dist(babel) > 2))
 Requires:       python2dist(colorama) >= 0.3.5
 Requires:       python2dist(docutils) >= 0.11
@@ -92,7 +93,7 @@ Sphinx uses...
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 
-Requires:       (python3dist(alabaster) >= 0.7 with python3dist(alabaster) < 0.8)
+Requires:       (python3dist(alabaster) >= 0.7 with python3dist(alabaster) < 0.8~~)
 Requires:       (python3dist(babel) >= 1.3 with (python3dist(babel) < 2 or python3dist(babel) > 2))
 Requires:       python3dist(colorama) >= 0.3.5
 Requires:       python3dist(docutils) >= 0.11
@@ -123,7 +124,7 @@ Summary:        Sphinx documentation
 Documentation for Sphinx
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n %{pypi_name}-%{pypi_version}
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
@@ -150,7 +151,7 @@ rm -rf %{buildroot}%{_bindir}/*
 %license LICENSE
 %doc README.rst
 %{python2_sitelib}/sphinx
-%{python2_sitelib}/%{pypi_name}-%{version}-py%{python2_version}.egg-info
+%{python2_sitelib}/%{pypi_name}-%{pypi_version}-py%{python2_version}.egg-info
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -160,7 +161,7 @@ rm -rf %{buildroot}%{_bindir}/*
 %{_bindir}/sphinx-build
 %{_bindir}/sphinx-quickstart
 %{python3_sitelib}/sphinx
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pypi_name}-%{pypi_version}-py%{python3_version}.egg-info
 
 %files -n python-%{srcname}-doc
 %doc html

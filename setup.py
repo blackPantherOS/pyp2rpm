@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 from pyp2rpm.version import version
 
 from setuptools import setup
+from setuptools.command.build_py import build_py as _build_py
 
 
 description = """Convert Python packages to RPM SPECFILES. The packages can be downloaded from
@@ -14,7 +16,26 @@ Users can provide their own templates for rendering the package metadata. Both t
 source and metadata can be extracted from PyPI or from local filesystem (local file doesn't
 provide that much information though)."""
 
+class build_py(_build_py):
+    def run(self):
+        # Run the normal build process
+        _build_py.run(self)
+        # Build test data
+        from subprocess import call
+        from shutil import copy
+        call([sys.executable, 'setup.py', 'sdist'],
+             cwd='tests/test_data/isholiday-0.1')
+        copy('tests/test_data/isholiday-0.1/dist/isholiday-0.1.tar.gz',
+             'tests/test_data/')
+        call([sys.executable, 'setup.py', 'sdist'],
+             cwd='tests/test_data/utest')
+        copy('tests/test_data/utest/dist/utest-0.1.0.tar.gz',
+             'tests/test_data/')
+
 setup(
+    cmdclass={
+        'build_py': build_py,
+    },
     name='pyp2rpm',
     version=version,
     description="Convert Python packages to RPM SPECFILES",
@@ -37,7 +58,13 @@ setup(
                     'click',
                     'Jinja2',
                     ],
-    tests_require=['pytest < 5;python_version<"3.5"', 'pytest;python_version>="3.5"'],
+    tests_require=['packaging < 21;python_version<"3.5"', 'pytest < 5;python_version<"3.5"',
+                   'pytest < 6.2;python_version=="3.5"', 'pytest < 7.1;python_version=="3.6"',
+                   'iniconfig < 2.0;python_version=="3.6"',
+                   'pytest;python_version>="3.7"', 'attrs < 21.1.0;python_version<"3.5"',
+                   'attrs < 23.1.0;python_version=="3.6"',
+                   'pluggy < 1.0;python_version<"3.8"',
+                   ],
     extras_require={
         'venv metadata': ['virtualenv-api'],
         'sclize': ['spec2scl >= 1.2.0']

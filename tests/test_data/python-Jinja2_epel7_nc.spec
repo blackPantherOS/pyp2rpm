@@ -1,26 +1,27 @@
 # Created by pyp2rpm-3.2.3
 %global pypi_name Jinja2
+%global pypi_version 2.8
 
 Name:           python-%{pypi_name}
-Version:        2.8
+Version:        %{pypi_version}
 Release:        1%{?dist}
 Summary:        A small but fast and easy to use stand-alone template engine written in pure python
 
 License:        BSD
 URL:            http://jinja.pocoo.org/
-Source0:        https://files.pythonhosted.org/packages/source/J/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/J/%{pypi_name}/%{pypi_name}-%{pypi_version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python2-devel
 BuildRequires:  python2-Babel >= 0.8
 BuildRequires:  python2-MarkupSafe
 BuildRequires:  python2-setuptools
-BuildRequires:  python2-sphinx
 
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-Babel >= 0.8
 BuildRequires:  python%{python3_pkgversion}-MarkupSafe
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-sphinx
 
 %description
 Jinja2 is a template engine written in pure Python. It provides a Django_
@@ -62,7 +63,7 @@ Summary:        Jinja2 documentation
 Documentation for Jinja2
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n %{pypi_name}-%{pypi_version}
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
@@ -70,15 +71,15 @@ rm -rf %{pypi_name}.egg-info
 %{__python2} setup.py build
 %{__python3} setup.py build
 # generate html docs
-PYTHONPATH=${PWD} sphinx-build docs html
+PYTHONPATH=${PWD} sphinx-build-%{python3_version} docs html
 # remove the sphinx-build leftovers
 rm -rf html/.{doctrees,buildinfo}
 
 %install
 # Must do the default python version install last because
 # the scripts in /usr/bin are overwritten with every setup.py install.
-%{__python3} setup.py install --skip-build --root %{buildroot}
 %{__python2} setup.py install --skip-build --root %{buildroot}
+%{__python3} setup.py install --skip-build --root %{buildroot}
 
 %check
 %{__python2} setup.py test
@@ -87,12 +88,12 @@ rm -rf html/.{doctrees,buildinfo}
 %files -n python2-%{pypi_name}
 %doc README.rst
 %{python2_sitelib}/jinja2
-%{python2_sitelib}/%{pypi_name}-%{version}-py%{python2_version}.egg-info
+%{python2_sitelib}/%{pypi_name}-%{pypi_version}-py%{python2_version}.egg-info
 
 %files -n python%{python3_pkgversion}-%{pypi_name}
 %doc README.rst
 %{python3_sitelib}/jinja2
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pypi_name}-%{pypi_version}-py%{python3_version}.egg-info
 
 %files -n python-%{pypi_name}-doc
 %doc html
