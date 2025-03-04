@@ -1,18 +1,18 @@
 from pyp2rpm import utils
 
-DEFAULT_TEMPLATE = 'fedora'
+DEFAULT_TEMPLATE = 'blackpantheros'
 DEFAULT_PYTHON_VERSIONS = {
     'fedora': ['3'],
     'epel7': ['2', '3'],
     'epel6': ['2'],
     'mageia': ['3'],
-    'blackpantheros': ['2', '3'],
+    'blackpantheros': ['2','3'],
     'pld': ['2', '3']
 }
 DEFAULT_PYTHON_VERSION = DEFAULT_PYTHON_VERSIONS[DEFAULT_TEMPLATE][0]
 DEFAULT_PKG_SOURCE = 'pypi'
 DEFAULT_METADATA_SOURCE = 'pypi'
-DEFAULT_DISTRO = 'fedora'
+DEFAULT_DISTRO = 'blackpantheros'
 DEFAULT_PKG_SAVE_PATH = utils.get_default_save_path()
 KNOWN_DISTROS = DEFAULT_PYTHON_VERSIONS.keys()
 ARCHIVE_SUFFIXES = ['.tar', '.tgz', '.tar.gz', '.tar.bz2',
